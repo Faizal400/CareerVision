@@ -1,0 +1,11 @@
+{% extends "career_explorer/base.html" %}
+
+{% block content %}
+{% for r in results %}
+<h2>{{ r.job.title }}</h2>
+<h3>{{ r.fit_score }}</h3>
+<p>{{ r.explanation.summary }}</p>
+<p>Matched skills: {{ r.matched|join:", " }} | Missing skills: {{ r.missing|join:", " }}</p>
+<p>Skill coverage: {{ r.overlap_score|floatformat:2 }}</p>
+{% endfor %}
+{% endblock %}
