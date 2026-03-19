@@ -138,6 +138,3 @@ This is also your viva script. When a supervisor points at any part of your code
 | M4 | Skill extraction (U/T sets) | `/test-skills/` URL returns matched, missing, surplus skills + overlap score. False positive issue identified and mitigated with alias layer + word-boundary matching. |
 
 ---
-
-## What to add as you build
-Each time we complete a milestone, add a row to the milestones table and a new entry under the relevant section. When you spot a limitation, add it to the limitations table immediately — don't wait until the report. Honest limitations written in real time are worth more marks than vague limitations written at the end.
