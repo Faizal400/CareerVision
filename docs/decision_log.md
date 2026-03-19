@@ -10,7 +10,7 @@ Every entry follows the same format:
 - **Trade-off** — what you lose
 - **Mitigation** — how you reduce the loss
 
-This can aslo be a viva script. When I'm asked about any part of the code and asked "why did you do it this way?", the answer could be found in here.
+This can also be a viva script. When I'm asked about any part of the code and asked "why did you do it this way?", the answer could be found in here.
 
 ---
 
