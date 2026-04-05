@@ -1,0 +1,21 @@
+{% extends "tracker/base.html" %}
+
+{% block content %}
+<h1>Progress Tracker Dashboard</h1>
+<p>Welcome to your Progress Tracker! Here you can view and manage your skill development plans.</p>
+{% if plans %}
+<ul>
+    {% for plan in plans %}
+    <li>
+        <h2>{{ plan.plan_name }}</h2>
+        <p>Source: {{ plan.get_source_display }}</p>
+        <p>Number of skills to develop: {{ plan.trackedskill_set.count }}</p>
+        <p>Created at: {{ plan.date_created }}</p>
+    </li>
+    {# <a href="{% url 'tracker_plan_detail' plan.id %}">View Plan</a> #}
+    {% endfor %}    
+</ul>
+{% else %}
+<p>You have no skill development plans yet. Use the Career Explorer to find roles or the CV Matcher to directly compare your cv to your chosen job/role and save skills to your tracker!</p>
+{% endif %}
+{% endblock %}

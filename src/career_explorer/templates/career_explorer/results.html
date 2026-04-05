@@ -6,6 +6,17 @@
 <h3>{{ r.fit_score }}</h3>
 <p>{{ r.explanation.summary }}</p>
 <p>Matched skills: {{ r.matched|join:", " }} | Missing skills: {{ r.missing|join:", " }}</p>
+<form method="post" action="{% url 'save_tskill_toplan' %}">
+{% csrf_token %}
+<input type="hidden" name="source" value="0">
+<input type="text" name="plan_name" placeholder="Plan name">
+{% for skill in r.missing %}
+<input type="checkbox" id="skill_{{ forloop.counter }}" name="skills" value="{{ skill }}">
+<label for="skill_{{ forloop.counter }}"> {{ skill }}</label><br>
+{% endfor %}
+<button type="submit">Save selected skills to Tracker</button>
+</form>
 <p>Skill coverage: {{ r.overlap_score|floatformat:2 }}</p>
+<p>{{ r.contrib }}</p>
 {% endfor %}
 {% endblock %}

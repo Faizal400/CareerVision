@@ -121,4 +121,5 @@ def build_explanation(
         "top_missing":    top_missing,
         "next_actions":   next_actions,
         "fit_percent":    fit_percent,
+        "job_title":      job_title,
     }

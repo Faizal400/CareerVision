@@ -1,0 +1,14 @@
+{% extends "cv_matcher/base.html" %}
+
+{% block content %}
+<h2>{{ results.explanation.job_title }}</h2>
+<h3>{{ results.fit_score }}</h3>
+<p>{{ results.explanation.summary }}</p>
+<p>Matched skills: {{ results.matched|join:", " }} | Missing skills: {{ results.missing|join:", " }}</p>
+<p>Skill coverage: {{ results.overlap_score|floatformat:2 }}</p>
+<h3> Next actions: </h3>
+{% for action in results.explanation.next_actions %}
+<p>{{ action }}</p>
+{% endfor %}
+<p>{{ results.contrib }}</p>
+{% endblock %}

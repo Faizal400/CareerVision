@@ -2,11 +2,12 @@
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .services.retrieval_service import get_top_jobs
 from .services.careerfit_service import run_careerfit
 from core_engine.skill_extraction import _build_skill_index, build_U_T, skill_gap_summary
 from .forms import CareerExplorerForm
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def ingest(request):
     if request.method == "POST":
         form = CareerExplorerForm(request.POST, request.FILES)
@@ -17,14 +18,11 @@ def ingest(request):
 
             # Extract text from file if uploaded, else use pasted text
             if cv_file:
-                from career_explorer.services.text_extraction import extract_cv_text
+                from core_engine.text_extraction import extract_cv_text
                 cv_text = extract_cv_text(cv_file)
-                print(f"DEBUG extracted text length: {len(cv_text)}, preview: {cv_text[:100]}")
             # Store in session so results view can read it
             request.session["cv_text"] = cv_text
             request.session["experience_level"] = experience_level
-            print(f"DEBUG session cv_text length: {len(request.session.get('cv_text', ''))}")
-            print(f"DEBUG session experience_level: {request.session.get('experience_level')}")
 
             return redirect("career_explorer_results")
     else:
@@ -33,11 +31,10 @@ def ingest(request):
     return render(request, "career_explorer/ingest.html", {"form": form})
 
 
+@login_required
 def results_view(request):
     k_jobs = 10
     if request.method == "GET":
-        print(f"DEBUG results session cv_text: {request.session.get('cv_text', 'MISSING')[:50]}")
-        print(f"DEBUG results session experience_level: {request.session.get('experience_level', 'MISSING')}")
         cv_text = request.session.get("cv_text")
         experience_level = request.session.get("experience_level")
         if cv_text and experience_level is not None:
@@ -46,18 +43,6 @@ def results_view(request):
         else:
             return redirect("career_explorer_ingest")
     return render(request, "career_explorer/results.html")
-
-
-def test_retrieval(request):
-    cv_text = request.GET.get("cv", "python django sql git linux docker rest api")
-
-    results = get_top_jobs(cv_text, M=4)
-
-    lines = [f"<h2>Top matches for: '{cv_text}'</h2>"]
-    for job, score in results:
-        lines.append(f"<p><b>{job.title}</b> @ {job.location} — score: {score:.3f}</p>")
-
-    return HttpResponse("\n".join(lines))
 
 def test_skills(request):
     cv_text = request.GET.get("cv", "Python Django SQL Git Linux Docker REST API data modelling")
@@ -79,7 +64,6 @@ def test_skills(request):
 
     return HttpResponse("\n".join(lines))
 
-from .services.careerfit_service import run_careerfit
 
 def test_careerfit(request):
     cv_text    = request.GET.get("cv", "Python Django SQL Git Linux Docker REST API data modelling")

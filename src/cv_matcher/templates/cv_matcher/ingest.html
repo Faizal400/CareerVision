@@ -1,0 +1,13 @@
+{% extends "cv_matcher/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>CareerVision — CV to Job Description (direct) matcher</h1>
+    <p>Upload your CV or paste your CV text along with your chosen job description below to find if it's a best match or not.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

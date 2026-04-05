@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}View Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ user.username }}'s Profile</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>First Name: {{ user.first_name }}</p>
+    <p>Last Name: {{ user.last_name }}</p>
+    <!-- Add more profile fields as needed -->
+    <a href="{% url 'delete_account' %}" class="btn btn-danger">
+        Delete Account
+    </a>
+</div>
+{% endblock %}

@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import SkillPlan, TrackedSkill
 
-# Register your models here.
+admin.site.register(SkillPlan)
+admin.site.register(TrackedSkill)
