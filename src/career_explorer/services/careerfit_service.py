@@ -51,7 +51,6 @@ def run_careerfit(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
 
         # Attach job metadata and fix job title in explanation
         result["job"] = job
-        #result["explanation"]["job_title"] = job.title
 
         results.append(result)
 

@@ -26,7 +26,6 @@ def run_cvmatcher(cv_text: str, jd_text: str, user_level: int = 1) -> dict:
         job_level   = 1,
         skill_index = skill_index,
         job_title   = jd_title,
-    )    
-    #result["explanation"]["job_title"] = jd_title
+    )
 
     return result

@@ -1,0 +1,27 @@
+{% extends "tracker/base.html" %}
+
+{% block content %}
+<h1>{{ plan.plan_name }}</h1>
+<p>Source: {{ plan.get_source_display }}</p>
+<p>Created at: {{ plan.date_created }}</p>
+{% if tracked_skills %}
+<ul>
+    {% for ts in tracked_skills %}
+    <li>{{ ts.skill_name }} - {{ ts.get_skill_prog_status_display }}
+        <form method="post" action="{% url 'tracker_update_skill_status' ts.id %}">
+            {% csrf_token %}
+            <p>Change {{ ts.skill_name }} status</p>
+            <select name="skill_prog_status">
+                <option value="0" {% if ts.skill_prog_status == 0 %}selected{% endif %}>Not Started</option>
+                <option value="1" {% if ts.skill_prog_status == 1 %}selected{% endif %}>In Progress</option>
+                <option value="2" {% if ts.skill_prog_status == 2 %}selected{% endif %}>Done</option>
+            </select>
+            <button type="submit">Update</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No skills added to this plan yet.</p>
+{% endif %}
+{% endblock %}

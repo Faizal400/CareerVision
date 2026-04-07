@@ -28,3 +28,23 @@ def save_tskill_toplan(request):
 def tracker_dashboard(request):
     plans = SkillPlan.objects.filter(user=request.user).order_by("-plan_name", "-date_created")
     return render(request, "tracker/dashboard.html", {"plans": plans})
+
+@login_required
+def plan_detail(request, plan_id):
+    plan = SkillPlan.objects.filter(id=plan_id, user=request.user).first()
+    if not plan:
+        return HttpResponse("Plan not found", status=404)
+    tracked_skills = TrackedSkill.objects.filter(plan=plan)
+    return render(request, "tracker/plan_detail.html", {"plan": plan, "tracked_skills": tracked_skills})
+
+@login_required
+def update_skill_status(request, skill_id):
+    if request.method == "POST":
+        skill = TrackedSkill.objects.filter(id=skill_id, plan__user=request.user).first()
+        if not skill:
+            return HttpResponse("Skill not found", status=404)
+        new_status = int(request.POST.get("skill_prog_status", skill.skill_prog_status))
+        skill.skill_prog_status = new_status
+        skill.save()
+        return redirect("tracker_plan_detail", plan_id=skill.plan.id)
+    return HttpResponse("Invalid request method", status=400)

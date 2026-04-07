@@ -1,4 +1,4 @@
-# src/career_explorer/services/text_extraction.py
+# src/core_engine/text_extraction.py
 
 from docx import Document
 from pypdf import PdfReader

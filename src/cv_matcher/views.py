@@ -17,7 +17,6 @@ def ingest(request):
             if cv_file:
                 from core_engine.text_extraction import extract_cv_text
                 cv_text = extract_cv_text(cv_file)
-                print(f"DEBUG extracted text length: {len(cv_text)}, preview: {cv_text[:100]}")
             # Store in session so results view can read it
             request.session["cv_text"] = cv_text
             request.session["experience_level"] = experience_level
@@ -35,7 +34,6 @@ def results_view(request):
         jd_text = request.session.get("jd_text")
         if cv_text and experience_level is not None and jd_text:
             matched_result = run_cvmatcher(cv_text, jd_text, experience_level)
-            print(f"DEBUG job_title: {matched_result['explanation']['job_title']}")
             return render(request, "cv_matcher/results.html", {"results": matched_result})
         else:
             return redirect("cv_matcher_ingest")

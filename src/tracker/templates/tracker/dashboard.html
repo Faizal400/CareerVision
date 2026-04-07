@@ -12,10 +12,11 @@
         <p>Number of skills to develop: {{ plan.trackedskill_set.count }}</p>
         <p>Created at: {{ plan.date_created }}</p>
     </li>
-    {# <a href="{% url 'tracker_plan_detail' plan.id %}">View Plan</a> #}
-    {% endfor %}    
+    <a href="{% url 'tracker_plan_detail' plan.id %}">View Plan</a>
+    {% endfor %}
 </ul>
 {% else %}
-<p>You have no skill development plans yet. Use the Career Explorer to find roles or the CV Matcher to directly compare your cv to your chosen job/role and save skills to your tracker!</p>
+<p>You have no skill development plans yet. Use the Career Explorer to find roles or the CV Matcher to directly compare
+    your cv to your chosen job/role and save skills to your tracker!</p>
 {% endif %}
 {% endblock %}
