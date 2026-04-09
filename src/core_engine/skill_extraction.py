@@ -1,6 +1,8 @@
 # src/core_engine/skill_extraction.py
 import re
 from core_engine.preprocess import normalise_text
+from core_engine.embeddings import extract_skills_semantic
+from django.core.cache import cache
 
 # Skills with labels shorter than this are too risky for substring matching
 MIN_LABEL_LENGTH = 3
@@ -66,7 +68,6 @@ def _extract_keyword(label: str) -> str:
         return label  # fallback: keep original
     return max(words, key=len)  # pick the longest meaningful word
 
-
 def _build_skill_index() -> dict[str, str]:
     """
     Builds two-layer skill index:
@@ -76,6 +77,9 @@ def _build_skill_index() -> dict[str, str]:
     Keys:   normalised match string
     Values: display label shown to user
     """
+    cached = cache.get("skill_index")
+    if cached is not None:
+        return cached
     from career_explorer.models import ESCOSkill
 
     index = {}
@@ -97,7 +101,7 @@ def _build_skill_index() -> dict[str, str]:
         # Don't overwrite an alias with a weaker ESCO match
         if keyword not in index:
             index[keyword] = skill.skill_label
-
+    cache.set("skill_index", index, timeout=None)
     return index
 
 
@@ -120,12 +124,20 @@ def extract_skills(text: str, skill_index: dict[str, str]) -> set[str]:
 
 
 def build_U_T(cv_text: str, job_description: str,
-              skill_index: dict[str, str]) -> tuple[set[str], set[str]]:
+              skill_index: dict[str, str], use_semantic_T: bool = False) -> tuple[set[str], set[str]]:
     """
     Build user skill set U and target skill set T.
     """
     U = extract_skills(cv_text, skill_index)
     T = extract_skills(job_description, skill_index)
+    Usemantic = extract_skills_semantic(cv_text)
+    Tsemantic = extract_skills_semantic(job_description)
+    #print(f"DEBUG U semantic only (not in keyword): {Usemantic - U}")
+    #print(f"DEBUG T semantic only (not in keyword): {Tsemantic - T}")
+    U |= Usemantic
+    if use_semantic_T:
+        T |= Tsemantic
+    # ^^ set.union() returns a new set, doesn't modifty original. |= modifies in place, more efficient.  U |= Usemantic updates U directly without creating a new set.
     return U, T
 
 

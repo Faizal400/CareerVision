@@ -1,8 +1,10 @@
 # src/career_explorer/views.py
 
+from time import time
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .services.careerfit_service import run_careerfit
+from .services.careerexplorer_service import run_careerexplorer
 from .forms import CareerExplorerForm
 from django.contrib.auth.decorators import login_required
 
@@ -37,7 +39,11 @@ def results_view(request):
         cv_text = request.session.get("cv_text")
         experience_level = request.session.get("experience_level")
         if cv_text and experience_level is not None:
-            best_k_matches = run_careerfit(cv_text=cv_text, user_level=experience_level, M=k_jobs)
+            import time
+            start = time.time()
+            best_k_matches = run_careerexplorer(cv_text=cv_text, user_level=experience_level, M=k_jobs)
+            elapsed = time.time() - start
+            print(f"Pipeline took: {elapsed:.2f}s")
             return render(request, "career_explorer/results.html", {"results": best_k_matches})
         else:
             return redirect("career_explorer_ingest")

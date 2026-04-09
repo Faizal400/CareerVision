@@ -5,9 +5,10 @@ from core_engine.preprocess import normalise_text
 from core_engine.retrieval import retrieve_top_m
 from core_engine.skill_extraction import _build_skill_index
 from core_engine.comparison import compare_cv_to_jd
+import time
 
 
-def run_careerfit(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
+def run_careerexplorer(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
     """
     Tool A pipeline: retrieve top-M jobs by TF-IDF, then
     re-rank each using compare_cv_to_jd (CareerFit).
@@ -29,14 +30,19 @@ def run_careerfit(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
     # Step 1: TF-IDF shortlist — efficient retrieval
     job_texts = [normalise_text(j.description) for j in jobs]
     cv_clean  = normalise_text(cv_text)
+    t0 = time.time()
     top_m     = retrieve_top_m(cv_clean, job_texts, M=min(M, len(jobs)))
+    print(f"TF-IDF retrieval: {time.time()-t0:.2f}s")
 
     # Step 2: build skill index once — shared across all comparisons
+    t0 = time.time()
     skill_index = _build_skill_index()
+    print(f"Skill index build: {time.time()-t0:.2f}s")
 
     results = []
 
     # Step 3: CareerFit score for each shortlisted job
+    t0 = time.time()
     for idx, _ in top_m:
         job = jobs[idx]
 
@@ -47,6 +53,7 @@ def run_careerfit(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
             job_level  = job.seniority_level,
             skill_index = skill_index,
             job_title= job.title,
+            use_semantic_T=False, # no point adding it when our job corpus is small and likely already well-covered by keyword matching. Also prevents false positives from semantic matching which can be an issue with short texts.
         )
 
         # Attach job metadata and fix job title in explanation
@@ -55,4 +62,5 @@ def run_careerfit(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
         results.append(result)
 
     results.sort(key=lambda r: r["fit_score"], reverse=True)
+    print(f"CareerFit loop: {time.time()-t0:.2f}s")
     return results

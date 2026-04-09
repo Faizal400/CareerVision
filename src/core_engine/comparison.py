@@ -26,6 +26,7 @@ def compare_cv_to_jd(
     job_level: int,
     skill_index: dict,
     job_title: str = "",
+    use_semantic_T: bool = False,
 ) -> dict:
     """
     Compare one CV against one job description.
@@ -51,7 +52,7 @@ def compare_cv_to_jd(
     )
 
     # Step 2: skill sets
-    U, T = build_U_T(cv_text, jd_text, skill_index)
+    U, T = build_U_T(cv_text, jd_text, skill_index, use_semantic_T)
     summary = skill_gap_summary(U, T)
 
     matched = set(summary["matched"])

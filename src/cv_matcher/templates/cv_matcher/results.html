@@ -5,6 +5,8 @@
 <h3>{{ results.fit_score }}</h3>
 <p>{{ results.explanation.summary }}</p>
 <p>Matched skills: {{ results.matched|join:", " }}</p>
+{% if r.missing %}
+<h4>Missing Skills (click to add to plan):</h4>
 <form method="post" action="{% url 'save_tskill_toplan' %}">
 {% csrf_token %}
 <input type="hidden" name="source" value="1">
@@ -16,6 +18,9 @@
 {% endfor %}
 <button type="submit">Save selected skills to Tracker</button>
 </form>
+{% else %}  
+<p>All required skills are covered! No missing skills 😊</p>
+{% endif %}
 <p>Skill coverage: {{ results.overlap_score|floatformat:2 }}</p>
 <h3> Next actions: </h3>
 {% for action in results.explanation.next_actions %}
