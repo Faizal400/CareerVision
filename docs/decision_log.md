@@ -114,6 +114,11 @@ This can also be a viva script. When I'm asked about any part of the code and as
 **Trade-off:** Scores rely on keyword matching rather than semantic understanding — "Python developer" and "software engineer using Python" may score differently despite meaning the same thing.
 **Mitigation:** Embeddings added as an explicit later upgrade with ablation showing measurable improvement over TF-IDF baseline. Market relevance added once corpus is expanded. Both framed as planned extensions in the report, not omissions.
 
+### P8 — Semantic embeddings as Layer 3 skill matching
+**Decision:** Added sentence-transformers (all-MiniLM-L6-v2) as a third layer in skill extraction. Semantic U enabled for both tools. Semantic T enabled for Tool B only.
+**Why:** Keyword matching misses skills expressed differently ("build REST APIs" vs "REST API"). Embeddings match by meaning. Tool B uses real user-uploaded JDs where keyword coverage is uncertain. Tool A uses our controlled job corpus where keyword matching is sufficient for T.
+**Trade-off:** 8.6s pipeline time vs 4.5s keyword-only. Threshold of 0.35 still produces some false positives in T for Tool B.
+**Mitigation:** Semantic T disabled for Tool A preventing score degradation. Threshold tunable — documented in ablation study. False positives acknowledged as L2 limitation.
 ---
 
 ## Known limitations (honest acknowledgement — required for first-class)
