@@ -4,10 +4,12 @@
 <div class="container mt-5">
     <h1>CareerVision — Career Explorer</h1>
     <p>Upload your CV or paste your CV text below to find your best matching roles.</p>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Find My Matches</button>
-    </form>
+    <div class="card shadow-sm p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Find My Matches</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

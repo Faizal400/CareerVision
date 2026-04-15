@@ -4,19 +4,35 @@
 <h1>Progress Tracker Dashboard</h1>
 <p>Welcome to your Progress Tracker! Here you can view and manage your skill development plans.</p>
 {% if plans %}
-<ul>
-    {% for plan in plans %}
-    <li>
-        <h2>{{ plan.plan_name }}</h2>
-        <p>Source: {{ plan.get_source_display }}</p>
-        <p>Number of skills to develop: {{ plan.trackedskill_set.count }}</p>
-        <p>Created at: {{ plan.date_created }}</p>
-    </li>
-    <a href="{% url 'tracker_plan_detail' plan.id %}">View Plan</a>
-    {% endfor %}
-</ul>
+<table class="table table-dark table-striped mt-4">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Plan</th>
+            <th>Plan origin</th>
+            <th>Plan creation date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for plan in plans %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ plan.plan_name }}</td>
+            <td>{{ plan.get_source_display }}</td>
+            <td>{{ plan.date_created }}</td>
+            <td><a href="{% url 'tracker_plan_detail' plan.id %}">View Plan</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No Plans yet</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% else %}
 <p>You have no skill development plans yet. Use the Career Explorer to find roles or the CV Matcher to directly compare
     your cv to your chosen job/role and save skills to your tracker!</p>
 {% endif %}
 {% endblock %}
+

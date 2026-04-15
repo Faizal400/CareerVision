@@ -6,8 +6,16 @@ class CVMatcherForm(forms.Form):
         label="CV File",
         widget=forms.ClearableFileInput(attrs={"accept": ".pdf,.docx,.txt"})
     )
-    cv_text = forms.CharField(required=False,label="CV Text", widget=forms.Textarea)
-    jd_text = forms.CharField(required=True,label="Job Description (paste text here)", widget=forms.Textarea)
+    cv_text = forms.CharField(
+    required=False,
+    label="CV Text (paste here if not uploading your CV file)",
+    widget=forms.Textarea(attrs={"class": "form-control", "rows": 6})
+    )
+    jd_text = forms.CharField(
+        required=True,
+        label="Job Description (paste text here)",
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 8})
+    )
     experience_level = forms.ChoiceField(label="Experience Level",choices=[
         (0, "Intern / Placement"),
         (1, "Graduate / Junior"),

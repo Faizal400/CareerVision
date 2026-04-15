@@ -28,3 +28,7 @@ def delete_account(request):
         user.delete()
         return redirect("login")
     return render(request, f"{TEMPLATES_FOLDER}/delete_acc_confirm.html")
+
+@login_required
+def home(request):
+    return render(request, "index.html", {"user": request.user})
