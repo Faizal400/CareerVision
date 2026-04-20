@@ -5,6 +5,12 @@
 <h3>{{ results.fit_score }}</h3>
 <p>{{ results.explanation.summary }}</p>
 <p>Matched skills: {{ results.matched|join:", " }}</p>
+{% if results.explanation.next_actions %}
+<h4>Next actions:</h4>
+{% for action in r.explanation.next_actions %}
+<p>{{ action }}</p>
+{% endfor %}
+{% endif %}
 {% if results.missing %}
 <h4>Missing Skills (click to add to plan):</h4>
 <form method="post" action="{% url 'save_tskill_toplan' %}">

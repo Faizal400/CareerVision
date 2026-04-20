@@ -26,7 +26,8 @@ def compare_cv_to_jd(
     user_level: int,
     job_level: int,
     job_title: str = "",
-    ESCOoccupation=None
+    ESCOoccupation=None,
+    role_family:str = "",
 ) -> dict:
     """
     Compare one CV against one job description.
@@ -74,6 +75,8 @@ def compare_cv_to_jd(
         gap_score=summary["gap_score"],
         user_level=user_level,
         job_level=job_level,
+        role_family=role_family,
+        missing=summary["missing"],
     )
 
     # 5) Explanation (deterministic templates)
@@ -83,6 +86,7 @@ def compare_cv_to_jd(
         contrib=scored["contrib"],
         matched=summary["matched"],
         missing=summary["missing"],
+        role_family=role_family,
     )
 
     return {

@@ -1,7 +1,7 @@
 # cv_matcher/services/cv_matcher_service.py
 
 from core_engine.comparison import compare_cv_to_jd
-
+from core_engine.market_relevance import _classify_from_text
 
 def infer_job_level_from_text(jd_text: str) -> int:
     """
@@ -45,12 +45,13 @@ def run_cvmatcher(cv_text: str,
         job_title = "Pasted Job Description"
     if job_level is None:
         job_level = infer_job_level_from_text(jd_text)
-
+    job_role_family = _classify_from_text(jd_text)
     result = compare_cv_to_jd(
         cv_text=cv_text,
         jd_text=jd_text,
         user_level=user_level,
         job_level=job_level,
         job_title=job_title,
+        role_family=job_role_family
     )
     return result

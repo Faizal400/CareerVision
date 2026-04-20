@@ -1,5 +1,4 @@
 # src/core_engine/explanation.py
-
 """
 Explanation generator for CareerFit results.
 
@@ -51,14 +50,11 @@ def _top_contributors(contrib: dict, n: int = 3) -> list[tuple[str, float]]:
     return positive[:n]
 
 
-def _priority_missing(missing: list[str], n: int = 2) -> list[str]:
-    """
-    Return the top-n missing skills to highlight.
-    For now: first n alphabetically (stable, reproducible).
-    Later: rank by corpus frequency (market relevance feature).
-    """
-    return sorted(missing)[:n]
-
+def _priority_missing(missing: list[str], n: int = 2, role_family: str = "") -> list[str]:
+    from core_engine.market_relevance import compute_skill_frequencies
+    frequencies = compute_skill_frequencies(role_family=role_family)
+    result = sorted(missing, key=lambda s: frequencies.get(s, 0.0), reverse=True)[:n]
+    return result
 
 def build_explanation(
     job_title:   str,
@@ -66,6 +62,7 @@ def build_explanation(
     contrib:     dict,
     matched:     list[str],
     missing:     list[str],
+    role_family: str = "",
 ) -> dict:
     """
     Build a human-readable explanation from computed values.
@@ -94,7 +91,7 @@ def build_explanation(
     """
     fit_percent  = round(fit_score * 100, 1)
     top_reasons  = _top_contributors(contrib, n=3)
-    top_missing  = _priority_missing(missing, n=2)
+    top_missing  = _priority_missing(missing, n=2, role_family=role_family)
     next_actions = [_next_action(s) for s in top_missing]
 
     # Build summary sentence

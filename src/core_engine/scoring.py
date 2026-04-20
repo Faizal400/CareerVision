@@ -23,11 +23,15 @@ Weights are tunable. Changing weights should be backed by evaluation (ablation).
 # Weights — must sum to 1.0
 # Start with defendable defaults; tune later with small eval set.
 # ------------------------------------------------------------------
+from core_engine.market_relevance import compute_skill_frequencies
+
+
 WEIGHTS = {
     "tfidf":     0.10,
     "semantic":  0.40,
     "overlap":   0.25,
-    "gap":       0.20,
+    "gap":       0.10,
+    "market_relevance": 0.10,
     "seniority": 0.05,
 }
 
@@ -46,8 +50,18 @@ def score_semantic(semantic_raw: float) -> float:
     """Semantic similarity already mapped to [0, 1] by semantic_similarity()."""
     return _clamp(semantic_raw)
 
-
-
+def score_market_relevance(missing: list[str], role_family: str) -> float:
+    """
+    Average market relevance of missing skills, inverted.
+    0.0 = missing very high-frequency skills (bad)
+    1.0 = missing only rare skills (good)
+    """
+    if not missing:
+        return 1.0
+    frequencies = compute_skill_frequencies(role_family=role_family)
+    missing_freqs = [frequencies.get(s, 0.0) for s in missing]
+    avg_missing_freq = sum(missing_freqs) / len(missing_freqs)
+    return 1.0 - avg_missing_freq
 
 def score_seniority(user_level: int, job_level: int) -> float:
     """
@@ -76,6 +90,8 @@ def aggregate(
     gap_score: float,
     user_level: int,
     job_level: int,
+    missing:     list[str],
+    role_family: str = "",
 ) -> dict:
     """
     Compute all features, apply weights, return fit_score + breakdown. overlap and score gap are computed in skill_extraction.py and passed in here for aggregation.
@@ -85,8 +101,10 @@ def aggregate(
         semantic_raw: raw semantic similarity from sentence-transformers
         overlap_score:  score for overlapping skills
         gap_score:  score for skill gaps
+        market_relevance: score for market relevance of missing skills
         user_level: user's experience level (0–4)
         job_level:  job's seniority level (0–4)
+
 
     Outputs:
         {
@@ -97,6 +115,7 @@ def aggregate(
                 "overlap":   float,
                 "gap":       float,
                 "seniority": float,
+                "market_relevance": float,
             }
         }
 
@@ -110,6 +129,8 @@ def aggregate(
         "overlap": overlap_score,
         "gap": gap_score,
         "seniority": score_seniority(user_level, job_level),
+        "market_relevance": score_market_relevance(missing=missing, role_family=role_family),  # Placeholder, will be updated in comparison.py after missing skills are known
+
     }
 
     fit_score = sum(WEIGHTS[k] * scores[k] for k in WEIGHTS)

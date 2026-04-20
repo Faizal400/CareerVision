@@ -48,8 +48,8 @@ def run_careerexplorer(cv_text: str,
             user_level = user_level,
             job_level  = job.seniority_level,
             job_title= job.title,
-            ESCOoccupation=job.esco_occupation
-
+            ESCOoccupation=job.esco_occupation,
+            role_family=job.role_family
         ) 
         # compare_cv_to_jd calls extract_skills(). extract_skills() calls _build_phrases_rules which checks cache first.
         # So we aren't rebuilding the phrase rules for every job, just once on the first call. Subsequent calls are faster
