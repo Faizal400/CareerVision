@@ -3,12 +3,13 @@
 from career_explorer.models import Job
 from core_engine.preprocess import normalise_text
 from core_engine.retrieval import retrieve_top_m
-from core_engine.skill_extraction import _build_skill_index
 from core_engine.comparison import compare_cv_to_jd
 import time
 
 
-def run_careerexplorer(cv_text: str, user_level: int = 1, M: int = 10) -> list[dict]:
+def run_careerexplorer(cv_text: str, 
+                       user_level: int = 1, 
+                       M: int = 10) -> list[dict]:
     """
     Tool A pipeline: retrieve top-M jobs by TF-IDF, then
     re-rank each using compare_cv_to_jd (CareerFit).
@@ -34,14 +35,9 @@ def run_careerexplorer(cv_text: str, user_level: int = 1, M: int = 10) -> list[d
     top_m     = retrieve_top_m(cv_clean, job_texts, M=min(M, len(jobs)))
     print(f"TF-IDF retrieval: {time.time()-t0:.2f}s")
 
-    # Step 2: build skill index once — shared across all comparisons
-    t0 = time.time()
-    skill_index = _build_skill_index()
-    print(f"Skill index build: {time.time()-t0:.2f}s")
-
     results = []
 
-    # Step 3: CareerFit score for each shortlisted job
+    # Step 2: CareerFit score for each shortlisted job
     t0 = time.time()
     for idx, _ in top_m:
         job = jobs[idx]
@@ -51,10 +47,12 @@ def run_careerexplorer(cv_text: str, user_level: int = 1, M: int = 10) -> list[d
             jd_text    = job.description,
             user_level = user_level,
             job_level  = job.seniority_level,
-            skill_index = skill_index,
             job_title= job.title,
-            use_semantic_T=False, # no point adding it when our job corpus is small and likely already well-covered by keyword matching. Also prevents false positives from semantic matching which can be an issue with short texts.
-        )
+            ESCOoccupation=job.esco_occupation
+
+        ) 
+        # compare_cv_to_jd calls extract_skills(). extract_skills() calls _build_phrases_rules which checks cache first.
+        # So we aren't rebuilding the phrase rules for every job, just once on the first call. Subsequent calls are faster
 
         # Attach job metadata and fix job title in explanation
         result["job"] = job
