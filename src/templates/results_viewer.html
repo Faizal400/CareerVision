@@ -16,7 +16,7 @@
 
     {% if r.missing %}
     <h3>Missing skills</h3>
-    <p>There's a total of <strong>{{ r.missing|length }}</strong> missing skills.</p>
+    <p>Your CV is missing a total of <strong>{{ r.missing|length }}</strong> missing skills.</p>
     <p>Select any of the missing skills below to add to your tracker:</p>
 
     <form method="post" action="{% url 'save_tskill_toplan' %}">
