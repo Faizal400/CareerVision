@@ -4,12 +4,14 @@ import sqlite3
 from pathlib import Path
 
 from django.core.management.base import BaseCommand
-
+from django.conf import settings
+from pathlib import Path
 from career_explorer.models import ESCOSkill, ESCOOccupation, OccupationSkillRelation
 
 
 # Path to your existing esco.sqlite3 (the one import_esco.py already populated)
-ESCO_DB = Path(__file__).resolve().parents[5] / "CareerVision" / "data" / "db" / "esco.sqlite3"
+REPO_ROOT = Path(settings.BASE_DIR).parent # src/ => CareerVision/
+ESCO_DB = REPO_ROOT / "data" / "db" / "esco.sqlite3"
 
 
 class Command(BaseCommand):

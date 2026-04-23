@@ -1,0 +1,120 @@
+{% for r in results %}
+<section style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #ddd;">
+
+    <h2>{{ r.explanation.job_title }}</h2>
+    <p><strong>CareerFit score:</strong> {{ r.explanation.fit_percent }}% ({{ r.fit_score|floatformat:4 }})</p>
+    <p>{{ r.explanation.summary }}</p>
+
+    <h4>Matched skills</h4>
+    <p>
+        {% if r.matched %}
+            {{ r.matched|join:", " }}
+        {% else %}
+            None detected
+        {% endif %}
+    </p>
+
+    {% if r.missing %}
+    <h3>Missing skills</h3>
+    <p>There's a total of <strong>{{ r.missing|length }}</strong> missing skills.</p>
+    <p>Select any of the missing skills below to add to your tracker:</p>
+
+    <form method="post" action="{% url 'save_tskill_toplan' %}">
+        {% csrf_token %}
+        <input type="hidden" name="source" value="{{ source }}">
+
+        <div style="margin: 10px 0;">
+            <label for="plan_name_{{ forloop.counter }}"><strong>Plan name (optional)</strong></label><br>
+            <input id="plan_name_{{ forloop.counter }}" type="text" name="plan_name" placeholder="e.g., Core AI gaps" />
+        </div>
+
+        {% for skill in r.missing %}
+        <div style="margin: 4px 0;">
+            <input type="checkbox" id="skill_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="skills" value="{{ skill }}">
+            <label for="skill_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                <strong>{{ forloop.counter }}.</strong> {{ skill }}
+            </label>
+        </div>
+        {% endfor %}
+
+        <button type="submit" style="margin-top: 10px;">Add selected skills to Tracker</button>
+    </form>
+    {% else %}
+    <p><strong>Missing skills:</strong> None detected 😊</p>
+    {% endif %}
+
+    <p><strong>Skill coverage (weighted overlap):</strong> {{ r.overlap_score|floatformat:2 }}</p>
+
+    <h4>Next actions</h4>
+    {% if r.explanation.next_actions %}
+        {% for action in r.explanation.next_actions %}
+        <p>{{ action }}</p>
+        {% endfor %}
+    {% else %}
+        <p>No actions suggested.</p>
+    {% endif %}
+
+    <details style="margin-top:16px;">
+        <summary><strong>How the score was built (debug)</strong></summary>
+
+        <div style="margin-top:10px;">
+            <p style="margin:0;"><strong>{{ r.debug.story.headline }}</strong></p>
+            <p style="margin:6px 0 0 0;">
+                <strong>Top drivers:</strong>
+                {% for d in r.debug.story.drivers %}
+                    {% if not forloop.first %} · {% endif %}{{ d }}
+                {% endfor %}
+            </p>
+            <p style="margin:6px 0 0 0; color:#555;">{{ r.debug.story.rule }}</p>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; border-bottom:1px solid #ddd; padding:6px;">Feature</th>
+                    <th style="text-align:right; border-bottom:1px solid #ddd; padding:6px;">Raw (0–1)</th>
+                    <th style="text-align:right; border-bottom:1px solid #ddd; padding:6px;">Weight (cap)</th>
+                    <th style="text-align:right; border-bottom:1px solid #ddd; padding:6px;">Contribution</th>
+                    <th style="text-align:left; border-bottom:1px solid #ddd; padding:6px;">Visual</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rr in r.debug.rows %}
+                <tr>
+                    <td style="padding:6px; border-bottom:1px solid #f0f0f0;">
+                        <strong>{{ rr.label }}</strong><br>
+                        <span style="color:#777; font-size:12px;">{{ rr.key }}</span>
+                    </td>
+                    <td style="padding:6px; text-align:right; border-bottom:1px solid #f0f0f0;">
+                        {{ rr.raw|floatformat:3 }}
+                    </td>
+                    <td style="padding:6px; text-align:right; border-bottom:1px solid #f0f0f0;">
+                        {{ rr.weight|floatformat:2 }}
+                    </td>
+                    <td style="padding:6px; text-align:right; border-bottom:1px solid #f0f0f0;">
+                        <strong>{{ rr.contrib|floatformat:3 }}</strong>
+                    </td>
+                    <td style="padding:6px; border-bottom:1px solid #f0f0f0;">
+                        <div style="background:#eee; height:10px; border-radius:6px; overflow:hidden;">
+                            <div style="width: {{ rr.raw_pct }}%; height:10px; background:#4a90e2;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; color:#777; margin-top:4px;">
+                            <span>{{ rr.raw_pct }}%</span>
+                            <span>cap {{ rr.weight|floatformat:2 }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <details style="margin-top:10px;">
+            <summary>Raw debug object</summary>
+            <pre style="white-space:pre-wrap;">{{ r.debug|pprint }}</pre>
+        </details>
+    </details>
+
+</section>
+{% empty %}
+<p>No results to display yet.</p>
+{% endfor %}

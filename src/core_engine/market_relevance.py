@@ -9,7 +9,7 @@ def compute_skill_frequencies(role_family=None) -> dict[str, float]:
     across all jobs in the corpus.
     Cached after first computation.
     """
-    cache_key = f"skill_frequencies_{role_family or 'all'}"
+    cache_key = f"skill_frequencies::{(role_family or 'all').strip().lower()}"
     cached = cache.get(cache_key)
     if cached:
         return cached

@@ -44,7 +44,7 @@ def results_view(request):
             best_k_matches = run_careerexplorer(cv_text=cv_text, user_level=experience_level, M=k_jobs)
             elapsed = time.time() - start
             print(f"Pipeline took: {elapsed:.2f}s")
-            return render(request, "career_explorer/results.html", {"results": best_k_matches})
+            return render(request, "career_explorer/results.html", {"results": best_k_matches, "source": 0})
         else:
             return redirect("career_explorer_ingest")
     return render(request, "career_explorer/results.html")

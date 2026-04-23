@@ -34,7 +34,7 @@ def results_view(request):
         jd_text = request.session.get("jd_text")
         if cv_text and experience_level is not None and jd_text:
             matched_result = run_cvmatcher(cv_text, jd_text, experience_level)
-            return render(request, "cv_matcher/results.html", {"results": matched_result})
+            return render(request, "cv_matcher/results.html", {"results": [matched_result], "source": 1})
         else:
             return redirect("cv_matcher_ingest")
     return render(request, "cv_matcher/results.html")

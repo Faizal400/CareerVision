@@ -88,15 +88,15 @@ def compare_cv_to_jd(
         missing=summary["missing"],
         role_family=role_family,
     )
-
     return {
-        "fit_score": scored["fit_score"],
-        "contrib": scored["contrib"],
-        "matched": summary["matched"],
-        "missing": summary["missing"],
-        "surplus": summary["surplus"],
-        "overlap_score": summary["overlap_score"],
-        "explanation": explanation,
-        "tfidf_raw": round(tfidf_raw, 4),
-        "semantic_raw": round(semantic_raw, 4),
+    "fit_score": scored["fit_score"],
+    "contrib": scored["contrib"],
+    "debug": scored["debug"],
+    "matched": summary["matched"],
+    "missing": summary["missing"],
+    "surplus": summary["surplus"],
+    "overlap_score": summary["overlap_score"],
+    "explanation": explanation,
+    "tfidf_raw": round(tfidf_raw, 4),
+    "semantic_raw": round(semantic_raw, 4),
     }
