@@ -58,5 +58,4 @@ def semantic_similarity(text_a: str, text_b: str) -> float:
         return max(0.0, min(1.0, mapped))
     except Exception:
         # Safe fallback: system still functions on TF-IDF + skills
-        print("Warning: semantic similarity computation failed (missing dependency or other error). Returning 0.0.")
         return 0.0

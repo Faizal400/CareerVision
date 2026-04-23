@@ -25,7 +25,6 @@ Weights are tunable. Changing weights should be backed by evaluation (ablation).
 # ------------------------------------------------------------------
 from core_engine.market_relevance import compute_skill_frequencies
 
-
 WEIGHTS = {
     "tfidf":     0.10,
     "semantic":  0.40,
@@ -34,7 +33,6 @@ WEIGHTS = {
     "market_relevance": 0.10,
     "seniority": 0.05,
 }
-
 
 def _clamp(value: float) -> float:
     """Clamp a float to [0, 1]."""

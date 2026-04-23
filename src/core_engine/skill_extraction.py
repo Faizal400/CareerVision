@@ -192,7 +192,6 @@ def build_U_T(cv_text: str, job_description: str, occupation=None) -> tuple[set[
         T_unclassified = T - T_classified  # skills ESCO didn't give us a relation for
         T_ess = (T & ess_canonical) | T_unclassified  # unclassified treated as essential
         T_opt = T & opt_canonical
-        print(f"T={T}, T_ess={T_ess}, T_opt={T_opt}")
     else:
         T_ess = T
         T_opt = set()
