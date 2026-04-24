@@ -1,5 +1,4 @@
 # CareerVision - Decision Log
-*This is a living record of every real decision I made during the build. Not a polished report - more like a journal I kept alongside the code. When a supervisor asks "why did you do it this way?", the answer is in here.*
 
 ---
 
