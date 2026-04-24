@@ -1,18 +1,18 @@
 # CareerVision
 
-**Final Year Project — Faizal Ali, BSc Computer Science, Goldsmiths University of London (2026)**
+**Final Year Project - Faizal Ali, BSc Computer Science, Goldsmiths University of London (2026)**
 
 ---
 
 ## What it does
 
-CareerVision is a career matching platform built for CS and tech students who want to know how well their CV actually matches the roles they're applying for — not just a vague "good luck" but a real breakdown.
+CareerVision is a career matching platform built for CS and tech students who want to know how well their CV actually matches the roles they're applying for - not just a vague "good luck" but a real breakdown.
 
 There are three tools:
 
-- **Career Explorer** — upload your CV, get a ranked list of jobs from the corpus with a CareerFit score, matched skills, missing skills, and what to do next
-- **Direct Job Match** — paste a specific job description alongside your CV and get a head-to-head match report
-- **Skill Tracker** — save the skills you're missing and track your progress over time (Not Started → In Progress → Done)
+- **Career Explorer** - upload your CV, get a ranked list of jobs from the corpus with a CareerFit score, matched skills, missing skills, and what to do next
+- **Direct Job Match** - paste a specific job description alongside your CV and get a head-to-head match report
+- **Skill Tracker** - save the skills you're missing and track your progress over time (Not Started → In Progress → Done)
 
 The scoring model (CareerFit) combines six features: TF-IDF text similarity, semantic embedding similarity, skill overlap, skill gap penalty, market relevance of missing skills, and seniority alignment. Every result shows a breakdown of what contributed what.
 
@@ -20,7 +20,7 @@ The scoring model (CareerFit) combines six features: TF-IDF text similarity, sem
 
 ## Background
 
-I built this as a Final Year Project worth 25% of my degree. The core problem is that students applying for jobs rarely get useful, structured feedback — they either get rejected silently or get told "add more keywords." CareerVision tries to give explainable, evidence-based feedback grounded in a real skills taxonomy (ESCO) rather than generic AI advice.
+I built this as a Final Year Project worth 25% of my degree. The core problem is that students applying for jobs rarely get useful, structured feedback - they either get rejected silently or get told "add more keywords." CareerVision tries to give explainable, evidence-based feedback grounded in a real skills taxonomy (ESCO) rather than generic AI advice.
 
 Skill extraction uses ESCO v1.2.1 (13,939 skills, 3,039 occupations). Jobs are mapped to ESCO occupations so that essential vs optional skill distinctions feed into scoring. Market relevance is computed from how often each skill appears across the job corpus within the same role family.
 
@@ -124,7 +124,7 @@ Go to `http://127.0.0.1:8000` and register an account.
 cd src
 python manage.py test
 ```
-* To reproduce the ablation study results, run `python scripts/run_ablation.py` from the repo root (requires the full DB setup from steps 6-9 above). Prints four ranked top-10 lists — TF-IDF only, skill-only, semantic-only, and full CareerFit — against a sample CS graduate CV.*
+* To reproduce the ablation study results, run `python scripts/run_ablation.py` from the repo root (requires the full DB setup from steps 6-9 above). Prints four ranked top-10 lists - TF-IDF only, skill-only, semantic-only, and full CareerFit - against a sample CS graduate CV.*
 ---
 
 ## Project structure
@@ -133,7 +133,7 @@ python manage.py test
 CareerVision/
 ├── src/
 │   ├── config/                     # Django settings, URLs
-│   ├── core_engine/                # Pure Python pipeline — no Django imports
+│   ├── core_engine/                # Pure Python pipeline - no Django imports
 │   │   ├── preprocess.py           # Text normalisation
 │   │   ├── retrieval.py            # TF-IDF retrieval
 │   │   ├── skill_extraction.py     # Precision-first skill matching (U and T sets)
@@ -144,14 +144,14 @@ CareerVision/
 │   │   ├── market_relevance.py     # Skill frequency scoring + role family classifier
 │   │   ├── comparison.py           # Shared CV↔JD comparison unit
 │   │   └── text_extraction.py      # PDF/DOCX/TXT extraction
-│   ├── career_explorer/            # Tool A — Career Explorer
+│   ├── career_explorer/            # Tool A - Career Explorer
 │   │   ├── management/commands/    # import_esco, load_jobs, map_jobs_to_esco, classify_role_family
 │   │   ├── services/               # careerexplorer_service.py
 │   │   └── templates/
-│   ├── cv_matcher/                 # Tool B — Direct Job Match
+│   ├── cv_matcher/                 # Tool B - Direct Job Match
 │   │   ├── services/               # cv_matcher_service.py
 │   │   └── templates/
-│   ├── tracker/                    # Tool C — Skill Tracker
+│   ├── tracker/                    # Tool C - Skill Tracker
 │   ├── accounts/                   # Auth (register, login, logout, delete account)
 │   └── templates/                  # Shared templates (base, index, results_viewer)
 ├── data/
@@ -174,22 +174,22 @@ CareerVision/
 
 Full rationale for every choice is in `docs/decision_log.md`. Short version:
 
-- **Django monolith** — fast delivery, easy to demo locally, ORM abstracts the DB
-- **ESCO v1.2.1** — structured, free, machine-readable taxonomy with 13,939 skills and explicit occupation-skill relations
-- **Two-stage retrieval** — TF-IDF shortlist first (cheap), CareerFit re-ranking second (expensive). Keeps the pipeline under 10 seconds for 70 jobs.
-- **Precision-first skill extraction** — phrase-rule matching with a curated alias dict rather than single-keyword extraction from ESCO labels. Earlier approach extracted single words from verbose ESCO labels and produced "clean building facade" as a matched skill for a Python developer CV.
-- **Document-level semantic embeddings** — sentence-transformers used for CV↔JD similarity at document level, not skill-level. Skill-level semantic matching against 13,939 ESCO labels produced too many false positives at any usable threshold.
-- **Essential vs optional skill weighting** — ESCO records whether each skill is essential or optional for an occupation. Missing an essential skill is penalised twice as much as missing an optional one.
-- **Market relevance** — missing a skill that appears in 55% of similar roles is more urgent than missing one in 5%. Feeds into both scoring and next actions priority.
+- **Django monolith** - fast delivery, easy to demo locally, ORM abstracts the DB
+- **ESCO v1.2.1** - structured, free, machine-readable taxonomy with 13,939 skills and explicit occupation-skill relations
+- **Two-stage retrieval** - TF-IDF shortlist first (cheap), CareerFit re-ranking second (expensive). Keeps the pipeline under 10 seconds for 70 jobs.
+- **Precision-first skill extraction** - phrase-rule matching with a curated alias dict rather than single-keyword extraction from ESCO labels. Earlier approach extracted single words from verbose ESCO labels and produced "clean building facade" as a matched skill for a Python developer CV.
+- **Document-level semantic embeddings** - sentence-transformers used for CV↔JD similarity at document level, not skill-level. Skill-level semantic matching against 13,939 ESCO labels produced too many false positives at any usable threshold.
+- **Essential vs optional skill weighting** - ESCO records whether each skill is essential or optional for an occupation. Missing an essential skill is penalised twice as much as missing an optional one.
+- **Market relevance** - missing a skill that appears in 55% of similar roles is more urgent than missing one in 5%. Feeds into both scoring and next actions priority.
 
 ---
 
 ## Known limitations
 
-- Skill extraction is scoped to tech/CS roles. Non-tech CVs produce small or empty skill sets — this is a documented scope decision.
+- Skill extraction is scoped to tech/CS roles. Non-tech CVs produce small or empty skill sets - this is a documented scope decision.
 - ESCO occupation mapping uses TF-IDF title matching with a 0.5 threshold. Around 80% of mappings are accurate; the rest were manually corrected.
 - Job corpus is static (70 UK graduate JDs). Market relevance scores are corpus-relative.
-- Score ceiling is roughly 0.80 — CVs and JDs are different document formats so semantic similarity sits lower than a text-to-text match would.
+- Score ceiling is roughly 0.80 - CVs and JDs are different document formats so semantic similarity sits lower than a text-to-text match would.
 
 ---
 
@@ -201,8 +201,8 @@ Sample inputs for testing are in `scripts/demo_hello_pipeline.py`.
 
 ## Documentation
 
-- `docs/decision_log.md` — every design decision with rationale, trade-offs, and mitigations
-- This README — setup, structure, and usage
+- `docs/decision_log.md` - every design decision with rationale, trade-offs, and mitigations
+- This README - setup, structure, and usage
 
 ---
 

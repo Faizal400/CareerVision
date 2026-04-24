@@ -4,7 +4,7 @@ Explanation generator for CareerFit results.
 
 Rules:
 - Every sentence maps back to a computed value (score, set operation, or contrib).
-- No free-form AI generation — deterministic templates only.
+- No free-form AI generation - deterministic templates only.
 - This keeps explanations reproducible and defensible in evaluation.
 """
 
@@ -18,10 +18,10 @@ NEXT_ACTIONS = {
     "python":             "Add a Python project to GitHub with a README and tests.",
     "django":             "Build a small Django app (even a blog) and deploy it.",
     "sql":                "Write and commit 10 SQL queries covering JOINs, GROUP BY, and subqueries.",
-    "postgresql":         "Use PostgreSQL in a project — write 5 JOIN queries against real data.",
+    "postgresql":         "Use PostgreSQL in a project - write 5 JOIN queries against real data.",
     "git":                "Practise Git branching: create a feature branch, commit, and open a PR.",
-    "docker":             "Containerise an existing project — write a Dockerfile and docker-compose.yml.",
-    "rest api":           "Build a REST API with Django REST Framework — at least 3 endpoints.",
+    "docker":             "Containerise an existing project - write a Dockerfile and docker-compose.yml.",
+    "rest api":           "Build a REST API with Django REST Framework - at least 3 endpoints.",
     "javascript":         "Complete a small JS project (e.g. a to-do list) without a framework.",
     "react":              "Build a React component that fetches and displays data from an API.",
     "machine learning":   "Complete one end-to-end ML project: data → model → evaluation → report.",
@@ -86,8 +86,8 @@ def build_explanation(
 
     Failure case:
         If matched and missing are both empty (skill index failure),
-        explanation still returns — summary will reflect low score.
-        Never raises — always returns a complete dict.
+        explanation still returns - summary will reflect low score.
+        Never raises - always returns a complete dict.
     """
     fit_percent  = round(fit_score * 100, 1)
     top_reasons  = _top_contributors(contrib, n=3)

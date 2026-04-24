@@ -1,5 +1,5 @@
 """
-Market relevance scoring — how often each skill appears across the job corpus.
+Market relevance scoring - how often each skill appears across the job corpus.
 Cached per role family so it only runs once per server session.
 """
 

@@ -20,4 +20,4 @@ def extract_cv_text(cv_file) -> str:
         doc = Document(cv_file)
         return "\n".join(p.text for p in doc.paragraphs)
 
-    return ""  # unsupported type — return empty string
+    return ""  # unsupported type - return empty string

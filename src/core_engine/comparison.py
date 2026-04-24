@@ -1,7 +1,7 @@
 # core_engine/comparison.py
 
 """
-Single CV↔JD comparison — the atomic unit of CareerVision.
+Single CV↔JD comparison - the atomic unit of CareerVision.
 
 Both Tool A and Tool B call this function.
 Tool A calls it in a loop over many jobs.

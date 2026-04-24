@@ -8,7 +8,7 @@ from core_engine.preprocess import normalise_text
 
 
 class SeniorityScoreTests(TestCase):
-    """CareerFit seniority feature — distance-based scoring."""
+    """CareerFit seniority feature - distance-based scoring."""
 
     def test_perfect_match_returns_one(self):
         # same level should always be 1.0
@@ -30,7 +30,7 @@ class SeniorityScoreTests(TestCase):
 
 
 class SkillGapSummaryTests(TestCase):
-    """Weighted skill gap summary — essential vs optional."""
+    """Weighted skill gap summary - essential vs optional."""
 
     def test_all_essential_matched(self):
         U = {"Python", "Django", "Git"}
@@ -65,7 +65,7 @@ class SkillGapSummaryTests(TestCase):
 
 
 class SkillExtractionTests(TestCase):
-    """extract_skills — alias layer matching."""
+    """extract_skills - alias layer matching."""
 
     def test_finds_python_alias(self):
         skills = extract_skills("I write Python code daily")
@@ -87,7 +87,7 @@ class SkillExtractionTests(TestCase):
 
 
 class PreprocessTests(TestCase):
-    """normalise_text — consistent lowercasing and cleaning."""
+    """normalise_text - consistent lowercasing and cleaning."""
 
     def test_lowercases(self):
         self.assertEqual(normalise_text("Python DJANGO"), "python django")
@@ -97,7 +97,7 @@ class PreprocessTests(TestCase):
 
 
 class CareerExplorerViewTests(TestCase):
-    """Tool A views — auth and basic flow."""
+    """Tool A views - auth and basic flow."""
 
     def setUp(self):
         self.client = Client()

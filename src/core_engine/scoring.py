@@ -20,7 +20,7 @@ Weights are tunable. Changing weights should be backed by evaluation (ablation).
 """
 
 # ------------------------------------------------------------------
-# Weights — must sum to 1.0
+# Weights - must sum to 1.0
 # Start with defendable defaults; tune later with small eval set.
 # ------------------------------------------------------------------
 from core_engine.market_relevance import compute_skill_frequencies

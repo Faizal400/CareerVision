@@ -103,7 +103,7 @@ SKILL_ALIASES: dict[str, str] = {
     "swagger": "Swagger",
 
     # -------------------------
-    # Databases — relational
+    # Databases - relational
     # -------------------------
     "sql": "SQL",
     "postgresql": "PostgreSQL",
@@ -122,7 +122,7 @@ SKILL_ALIASES: dict[str, str] = {
     "relational databases": "Relational databases",
 
     # -------------------------
-    # Databases — NoSQL / other
+    # Databases - NoSQL / other
     # -------------------------
     "mongodb": "MongoDB",
     "mongo": "MongoDB",

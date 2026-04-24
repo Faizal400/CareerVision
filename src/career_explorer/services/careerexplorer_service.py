@@ -27,7 +27,7 @@ def run_careerexplorer(cv_text: str,
     if not jobs:
         return []
 
-    # Step 1: TF-IDF shortlist — efficient retrieval
+    # Step 1: TF-IDF shortlist - efficient retrieval
     job_texts = [normalise_text(j.description) for j in jobs]
     cv_clean  = normalise_text(cv_text)
     t0 = time.time()

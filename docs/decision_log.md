@@ -1,21 +1,21 @@
-# CareerVision — Decision Log
-*This is a living record of every real decision I made during the build. Not a polished report — more like a journal I kept alongside the code. When a supervisor asks "why did you do it this way?", the answer is in here.*
+# CareerVision - Decision Log
+*This is a living record of every real decision I made during the build. Not a polished report - more like a journal I kept alongside the code. When a supervisor asks "why did you do it this way?", the answer is in here.*
 
 ---
 
 ## How to read this
 
 Every entry has:
-- **What I decided** — the actual choice
-- **Why** — the real reason, not the cleaned-up version
-- **What I gave up** — honest trade-off
-- **How I'm managing that** — mitigation
+- **What I decided** - the actual choice
+- **Why** - the real reason, not the cleaned-up version
+- **What I gave up** - honest trade-off
+- **How I'm managing that** - mitigation
 
-Entries are roughly chronological. Later entries sometimes contradict earlier ones — that's intentional. This is a build log, not a design document written after the fact.
+Entries are roughly chronological. Later entries sometimes contradict earlier ones - that's intentional. This is a build log, not a design document written after the fact.
 
 ---
 
-## The beginning — March 2026
+## The beginning - March 2026
 
 Came into this with a solid idea on paper and a Django background but no experience with NLP, text similarity, or taxonomies. The spec was more detailed than my ability to execute it.
 
@@ -27,7 +27,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ## Architecture
 
-### A1 — Django monolith, not microservices
+### A1 - Django monolith, not microservices
 
 **What I decided:** Single Django project. Everything lives together.
 
@@ -35,15 +35,15 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 **What I gave up:** Can't scale components independently. If the ML part gets slow, it affects everything.
 
-**How I'm managing that:** Clean service layer separates concerns. `core_engine/` has no Django imports — pure Python, could be extracted later without touching views.
+**How I'm managing that:** Clean service layer separates concerns. `core_engine/` has no Django imports - pure Python, could be extracted later without touching views.
 
 ---
 
-### A2 — `core_engine/` separated from Django apps
+### A2 - `core_engine/` separated from Django apps
 
 **What I decided:** All pipeline logic lives in `src/core_engine/` as pure Python. Views never touch core_engine directly. The chain is always: view → service → core_engine.
 
-**Why:** Testable without starting a Django server. Both Tool A and Tool B reuse the same comparison logic — which they do through `comparison.py`.
+**Why:** Testable without starting a Django server. Both Tool A and Tool B reuse the same comparison logic - which they do through `comparison.py`.
 
 **What I gave up:** Slightly more complex import structure.
 
@@ -51,7 +51,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ---
 
-### A3 — SQLite for everything
+### A3 - SQLite for everything
 
 **What I decided:** SQLite as the DB for both development and ESCO import.
 
@@ -59,11 +59,11 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 **What I gave up:** Not suitable for concurrent production use.
 
-**How I'm managing that:** Django's ORM abstracts the database — switching to PostgreSQL is a one-line settings change. Documented as a known limitation.
+**How I'm managing that:** Django's ORM abstracts the database - switching to PostgreSQL is a one-line settings change. Documented as a known limitation.
 
 ---
 
-### A4 — `compare_cv_to_jd` as the shared atomic unit
+### A4 - `compare_cv_to_jd` as the shared atomic unit
 
 **What I decided:** Tool A and Tool B both call the same `compare_cv_to_jd` function. Tool A loops it. Tool B calls it once.
 
@@ -77,11 +77,11 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ## Data
 
-### D1 — ESCO v1.2.1 as the skill taxonomy
+### D1 - ESCO v1.2.1 as the skill taxonomy
 
 **What I decided:** Use ESCO as the canonical reference rather than building my own taxonomy.
 
-**Why:** Structured, free, machine-readable, 13,939 skills and 3,039 occupations with explicit occupation-skill relations. Nothing else at this scale is freely available and this well-organised. It also gives me a defensible data source — I didn't make these skills up.
+**Why:** Structured, free, machine-readable, 13,939 skills and 3,039 occupations with explicit occupation-skill relations. Nothing else at this scale is freely available and this well-organised. It also gives me a defensible data source - I didn't make these skills up.
 
 **What I gave up:** ESCO is EU-wide. Some UK-specific terminology doesn't map perfectly.
 
@@ -89,7 +89,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ---
 
-### D2 — Two-step ESCO import
+### D2 - Two-step ESCO import
 
 **What I decided:** Raw ESCO data first imported into `esco.sqlite3` via `scripts/import_esco.py`, then pulled into Django's DB via `manage.py import_esco`.
 
@@ -101,7 +101,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ---
 
-### D3 — `get_or_create` for all imports
+### D3 - `get_or_create` for all imports
 
 **What I decided:** All import commands use `get_or_create` rather than `bulk_create`.
 
@@ -113,7 +113,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ---
 
-### D4 — Static UK job corpus, not live scraping
+### D4 - Static UK job corpus, not live scraping
 
 **What I decided:** 70 UK graduate job descriptions in a CSV. No live scraping.
 
@@ -127,7 +127,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ## Pipeline
 
-### P1 — Two-stage retrieval: TF-IDF shortlist → CareerFit re-rank
+### P1 - Two-stage retrieval: TF-IDF shortlist → CareerFit re-rank
 
 **What I decided:** First shortlist top-M jobs via TF-IDF cosine similarity, then re-rank with full CareerFit scoring.
 
@@ -144,9 +144,9 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ---
 
-### P2 — TF-IDF with bigrams
+### P2 - TF-IDF with bigrams
 
-**What I decided:** `ngram_range=(1,2)` — unigrams and bigrams.
+**What I decided:** `ngram_range=(1,2)` - unigrams and bigrams.
 
 **Why:** "REST API" and "data modelling" are two-word phrases with specific meanings. Bigrams capture these. Unigrams alone would split them.
 
@@ -156,7 +156,7 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 ---
 
-### P3 — Keyword extraction approach (initial) — abandoned
+### P3 - Keyword extraction approach (initial) - abandoned
 
 *This was the first approach. It failed badly. Keeping it here because the failure led to the current design.*
 
@@ -164,13 +164,13 @@ The governing question throughout: what's the minimum I need to do to make this 
 
 **What actually happened:** Catastrophic false positives. "clean building facade" → keyword "clean". Any CV or JD mentioning "clean code" or "clean interfaces" triggered "clean building facade" as a matched skill. A Python developer CV matched "sell processed timber in a commercial environment".
 
-I didn't discover this by reading the code carefully — I discovered it on 15 April when I actually tested the system with a real CV and a real JD from G-Research. The output was embarrassing. Before that I'd been testing with toy inputs that didn't trigger the worst cases.
+I didn't discover this by reading the code carefully - I discovered it on 15 April when I actually tested the system with a real CV and a real JD from G-Research. The output was embarrassing. Before that I'd been testing with toy inputs that didn't trigger the worst cases.
 
 That test was the turning point. The whole skill extraction layer needed a rewrite.
 
 ---
 
-### P4 — Initial CareerFit: 4 features, then evolved to 6
+### P4 - Initial CareerFit: 4 features, then evolved to 6
 
 **Starting weights:**
 
@@ -180,22 +180,22 @@ That test was the turning point. The whole skill extraction layer needed a rewri
 | Skill overlap | 0.40 | 0.25 |
 | Gap penalty | 0.20 | 0.10 |
 | Seniority | 0.10 | 0.05 |
-| Semantic | — | 0.40 |
-| Market relevance | — | 0.10 |
+| Semantic | - | 0.40 |
+| Market relevance | - | 0.10 |
 
-**Why the weights shifted:** Semantic got added with 0.40 because it's the most robust signal — handles synonyms and paraphrasing that keyword matching misses. TF-IDF dropped because it's a baseline, not the main driver. Gap dropped because the essential/optional weighting now does the heavy lifting there.
+**Why the weights shifted:** Semantic got added with 0.40 because it's the most robust signal - handles synonyms and paraphrasing that keyword matching misses. TF-IDF dropped because it's a baseline, not the main driver. Gap dropped because the essential/optional weighting now does the heavy lifting there.
 
 Weights are hand-tuned, not learned. The ablation study provides evidence that the final configuration outperforms simpler alternatives.
 
 ---
 
-### P5 — In-memory caching for skill index and ML models
+### P5 - In-memory caching for skill index and ML models
 
 **What I decided:** Django `locmem` cache for phrase rules, sentence-transformers model, and skill frequency dicts.
 
 **Why:** First request builds everything. Subsequent requests return instantly. Without caching, loading 13,939 ESCO skills on every request would make the system unusable.
 
-**Why locmem over Redis:** Zero config for local development. Cache lost on server restart — acceptable for demo.
+**Why locmem over Redis:** Zero config for local development. Cache lost on server restart - acceptable for demo.
 
 **What I gave up:** Not persistent. Server restart clears everything.
 
@@ -203,7 +203,7 @@ Weights are hand-tuned, not learned. The ablation study provides evidence that t
 
 ---
 
-### P6 — Deterministic explanations, not LLM-generated
+### P6 - Deterministic explanations, not LLM-generated
 
 **What I decided:** All explanation text is template-based. `NEXT_ACTIONS` is a dict mapping skill labels to concrete advice. Summaries are f-strings built from computed values. No free-form generation.
 
@@ -215,7 +215,7 @@ Weights are hand-tuned, not learned. The ablation study provides evidence that t
 
 ---
 
-### P7 — JSONField for contrib and debug data
+### P7 - JSONField for contrib and debug data
 
 **What I decided:** Feature score breakdowns and debug rows stored as JSON in the result dict rather than normalised tables.
 
@@ -227,15 +227,15 @@ Weights are hand-tuned, not learned. The ablation study provides evidence that t
 
 ---
 
-### P8 — Precision-first skill extraction (major rework, April)
+### P8 - Precision-first skill extraction (major rework, April)
 
 **What triggered this:** Real CV + real JD test. "clean building facade", "sell processed timber", "propose projects to artist" as matched skills for a Python developer. Score 0.16. Missing skills showed empty despite skill coverage of 0.13.
 
 **What I changed:**
 
-Replaced `_extract_keyword` with `_build_phrase_rules()` — a list of `PhraseRule` objects:
+Replaced `_extract_keyword` with `_build_phrase_rules()` - a list of `PhraseRule` objects:
 - Layer 1: curated `SKILL_ALIASES` dict (manually maintained, highest precision)
-- Layer 2: ESCO labels passing tech-seed filter — must contain a `TECH_SEED_TOKENS` token, must have 2+ meaningful tokens, must have no banned domain tokens
+- Layer 2: ESCO labels passing tech-seed filter - must contain a `TECH_SEED_TOKENS` token, must have 2+ meaningful tokens, must have no banned domain tokens
 
 Matching:
 - Multi-word phrases: exact substring in normalised text
@@ -253,11 +253,11 @@ Matching:
 
 ---
 
-### P9 — Semantic embeddings at document level, not skill level
+### P9 - Semantic embeddings at document level, not skill level
 
 **What I tried first:** sentence-transformers matching CV text against 13,939 ESCO skill labels at threshold 0.35.
 
-**What happened:** The model found vague semantic connections between a Python developer CV and skills like "clean building facade", "nursing", "timber" — because the CV's general meaning overlapped weakly with hundreds of irrelevant ESCO skills. Tried 0.50 and 0.65. Either same noise appeared or nothing matched.
+**What happened:** The model found vague semantic connections between a Python developer CV and skills like "clean building facade", "nursing", "timber" - because the CV's general meaning overlapped weakly with hundreds of irrelevant ESCO skills. Tried 0.50 and 0.65. Either same noise appeared or nothing matched.
 
 **Root cause:** Encoding a whole CV as one vector and comparing it against short 3-5 word ESCO phrases is unreliable. The CV's meaning is a mixture of many topics and a short phrase can accidentally score high against part of that mixture.
 
@@ -269,7 +269,7 @@ Matching:
 
 ---
 
-### P10 — Semantic T disabled for Tool A, enabled for Tool B
+### P10 - Semantic T disabled for Tool A, enabled for Tool B
 
 **What I decided:** Tool A uses semantic only for U. T stays keyword-only. Tool B uses semantic for both U and T.
 
@@ -281,7 +281,7 @@ Matching:
 
 ---
 
-### P11 — Essential vs optional skill weighting
+### P11 - Essential vs optional skill weighting
 
 **What I decided:** When a job is mapped to an ESCO occupation, split T into essential skills (T_ess, weight 2) and optional skills (T_opt, weight 1) using `OccupationSkillRelation.relation_type`.
 
@@ -295,7 +295,7 @@ Matching:
 
 ---
 
-### P12 — ESCO occupation mapping via TF-IDF title matching
+### P12 - ESCO occupation mapping via TF-IDF title matching
 
 **What I decided:** Map each job to an ESCO occupation using TF-IDF similarity between job title and ESCO occupation label. Threshold: 0.5. Management command: `map_jobs_to_esco`.
 
@@ -309,23 +309,23 @@ Matching:
 
 Manual corrections applied for the worst cases via Django shell.
 
-**Why I kept automated mapping despite imperfections:** ~80% accuracy is better than zero. Bad mappings affect a small subset and only influence essential/optional weighting — not the core score. Documented honestly.
+**Why I kept automated mapping despite imperfections:** ~80% accuracy is better than zero. Bad mappings affect a small subset and only influence essential/optional weighting - not the core score. Documented honestly.
 
 ---
 
-### P13 — Role family classification
+### P13 - Role family classification
 
-**What I decided:** Two-stage automatic classification — ESCO occupation label matching (primary), keyword fallback (secondary). Four categories: tech_software, tech_data, tech_infrastructure, non_tech.
+**What I decided:** Two-stage automatic classification - ESCO occupation label matching (primary), keyword fallback (secondary). Four categories: tech_software, tech_data, tech_infrastructure, non_tech.
 
 **Why:** Market relevance needs to compare skill frequency within the same type of role. Python appearing in 55% of tech jobs is meaningful. Python appearing in 55% of all jobs (including nursing and teaching) is diluted.
 
 **Known issue:** Single-word keywords like "analyst" are ambiguous. "Graduate Financial Analyst" classified as tech_data. 22 manual corrections needed after the automated run.
 
-**Documented limitation:** A production-scale fix would use zero-shot classification using sentence-transformers against role family labels. Out of scope for this submission — documented as future work.
+**Documented limitation:** A production-scale fix would use zero-shot classification using sentence-transformers against role family labels. Out of scope for this submission - documented as future work.
 
 ---
 
-### P14 — Market relevance as CareerFit feature
+### P14 - Market relevance as CareerFit feature
 
 **What I decided:** 6th CareerFit feature. For each missing skill, look up corpus frequency within same role family. Average, invert. 1.0 means missing only rare skills (good), 0.0 means missing very common skills (bad).
 
@@ -335,9 +335,9 @@ Manual corrections applied for the worst cases via Django shell.
 
 ---
 
-### P15 — ESCO hierarchy traversal — investigated and abandoned
+### P15 - ESCO hierarchy traversal - investigated and abandoned
 
-**What I investigated:** `broaderRelationsSkillPillar_en.csv` — parent-child skill relationships. The idea: JavaScript partially satisfying a TypeScript requirement because TypeScript is a child of JavaScript.
+**What I investigated:** `broaderRelationsSkillPillar_en.csv` - parent-child skill relationships. The idea: JavaScript partially satisfying a TypeScript requirement because TypeScript is a child of JavaScript.
 
 **What I found:** 6,460 relations imported. Query results:
 
@@ -349,20 +349,20 @@ lead others → 143 children
 
 The hierarchy models generic competency relationships, not technical skill taxonomies. "JavaScript → TypeScript" doesn't exist. Both are siblings under "computer programming".
 
-**Decision:** Reverted the model and migration. Documented as investigated future work. A custom technical hierarchy would be required — out of scope.
+**Decision:** Reverted the model and migration. Documented as investigated future work. A custom technical hierarchy would be required - out of scope.
 
 ---
 
-### P16 — Ablation study
+### P16 - Ablation study
 
 Ran four CareerFit configurations against the same CV across 10 jobs:
 
 | Configuration | Junior Backend | Data Scientist | Ranking quality |
 |---|---|---|---|
-| TF-IDF only | 0.137 | 0.053 | Poor — Data Governance ranked 3rd |
-| Skill features only | 0.846 | 0.416 | Good — correct ordering |
-| Semantic only | 0.568 | 0.610 | Poor — scores bunched, Backend ranked 6th |
-| Full CareerFit | 0.771 | 0.585 | Best — correct ranking, differentiated |
+| TF-IDF only | 0.137 | 0.053 | Poor - Data Governance ranked 3rd |
+| Skill features only | 0.846 | 0.416 | Good - correct ordering |
+| Semantic only | 0.568 | 0.610 | Poor - scores bunched, Backend ranked 6th |
+| Full CareerFit | 0.771 | 0.585 | Best - correct ranking, differentiated |
 
 **Key findings:**
 
@@ -372,20 +372,20 @@ Semantic alone: scores bunched 0.54-0.65 with almost no differentiation. Junior 
 
 Skill features alone: correct ranking. But no semantic understanding.
 
-Full CareerFit: best ranking. Semantic handles meaning, skill features handle precision, market relevance prioritises important gaps. Neither TF-IDF nor semantic alone is sufficient — the combination is required.
+Full CareerFit: best ranking. Semantic handles meaning, skill features handle precision, market relevance prioritises important gaps. Neither TF-IDF nor semantic alone is sufficient - the combination is required.
 
 **Note**
-These results are reproducible — `scripts/run_ablation.py` runs all four configurations against the same sample CV and prints the ranked lists. Requires the full DB setup (jobs loaded, ESCO imported, roles mapped and classified).
+These results are reproducible - `scripts/run_ablation.py` runs all four configurations against the same sample CV and prints the ranked lists. Requires the full DB setup (jobs loaded, ESCO imported, roles mapped and classified).
 
 ---
 
-### P17 — Shared results template (DRY)
+### P17 - Shared results template (DRY)
 
 **What I decided:** Extract shared results display logic into `src/templates/results_viewer.html`. Both Tool A and Tool B results templates become thin wrappers. Tool B's view wraps its single result in a list.
 
 **Why:** Both results templates were ~95% identical. Copy-pasting fixes in one required updating the other.
 
-**Side effect fixed:** `source` was hardcoded as 1 in the shared template initially. Fixed by passing it as context from each view — 0 for Tool A, 1 for Tool B.
+**Side effect fixed:** `source` was hardcoded as 1 in the shared template initially. Fixed by passing it as context from each view - 0 for Tool A, 1 for Tool B.
 
 ---
 
@@ -411,22 +411,22 @@ These results are reproducible — `scripts/run_ablation.py` runs all four confi
 
 | Milestone | Evidence |
 |-----------|---------|
-| M1 — ESCO imported | 13,939 skills, 3,039 occupations, 126,051 relations. Idempotent. |
-| M2 — Job corpus loaded | 70 UK graduate JDs across STEM and non-STEM |
-| M3 — TF-IDF retrieval | Two-stage pipeline working |
-| M4 — Skill extraction | Precision-first. Before/after ablation documented. |
-| M5 — CareerFit scoring | 6-feature weighted model. Ablation across 4 configurations. |
-| M6 — Explanation generator | Deterministic templates. Market relevance drives next action priority. |
-| M7 — Tool A end-to-end | Upload CV → ranked results |
-| M8 — Tool B end-to-end | Paste CV + JD → match report with seniority inference |
-| M9 — Tool C Skill Tracker | Save missing skills, update status, dashboard |
-| M10 — Auth | Login, logout, register. Data isolation verified. |
-| M11 — Semantic embeddings | Document-level. Ablation vs keyword-only documented. |
-| M12 — Precision-first patch | Rewrote skill extraction after live test showed false positives |
-| M13 — Essential/optional weighting | ESCO relation_type used to weight T_ess 2× vs T_opt |
-| M14 — Market relevance | 6th CareerFit feature. Role family scoped. |
-| M15 — ESCO occupation mapping | 54/70 jobs mapped via TF-IDF title matching |
-| M16 — Role family classification | Two-stage classification. 4 categories. |
-| M17 — ESCO hierarchy traversal | Investigated and abandoned — generic competencies, not technical |
-| M18 — Shared results template | DRY'd Tool A and B results display |
-| M19 — Ablation study | 4 configurations tested. Full CareerFit outperforms all subsets. |
+| M1 - ESCO imported | 13,939 skills, 3,039 occupations, 126,051 relations. Idempotent. |
+| M2 - Job corpus loaded | 70 UK graduate JDs across STEM and non-STEM |
+| M3 - TF-IDF retrieval | Two-stage pipeline working |
+| M4 - Skill extraction | Precision-first. Before/after ablation documented. |
+| M5 - CareerFit scoring | 6-feature weighted model. Ablation across 4 configurations. |
+| M6 - Explanation generator | Deterministic templates. Market relevance drives next action priority. |
+| M7 - Tool A end-to-end | Upload CV → ranked results |
+| M8 - Tool B end-to-end | Paste CV + JD → match report with seniority inference |
+| M9 - Tool C Skill Tracker | Save missing skills, update status, dashboard |
+| M10 - Auth | Login, logout, register. Data isolation verified. |
+| M11 - Semantic embeddings | Document-level. Ablation vs keyword-only documented. |
+| M12 - Precision-first patch | Rewrote skill extraction after live test showed false positives |
+| M13 - Essential/optional weighting | ESCO relation_type used to weight T_ess 2× vs T_opt |
+| M14 - Market relevance | 6th CareerFit feature. Role family scoped. |
+| M15 - ESCO occupation mapping | 54/70 jobs mapped via TF-IDF title matching |
+| M16 - Role family classification | Two-stage classification. 4 categories. |
+| M17 - ESCO hierarchy traversal | Investigated and abandoned - generic competencies, not technical |
+| M18 - Shared results template | DRY'd Tool A and B results display |
+| M19 - Ablation study | 4 configurations tested. Full CareerFit outperforms all subsets. |

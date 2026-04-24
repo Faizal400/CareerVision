@@ -205,7 +205,7 @@ WEIGHT_OPT = 1
 def skill_gap_summary(U: set[str], T_ess: set[str], T_opt: set[str]) -> dict:
     """
     Returns matched, missing, surplus and weighted overlap/gap scores.
-    When no occupation is known, pass T_opt=set() — degrades gracefully to flat scoring.
+    When no occupation is known, pass T_opt=set() - degrades gracefully to flat scoring.
     """
     matched_ess = U & T_ess
     matched_opt = U & T_opt
