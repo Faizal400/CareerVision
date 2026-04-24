@@ -1,10 +1,9 @@
-# career_explorer/services/careerfit_service.py
+# career_explorer/services/careerexplorer_service.py
 
 from career_explorer.models import Job
 from core_engine.preprocess import normalise_text
 from core_engine.retrieval import retrieve_top_m
 from core_engine.comparison import compare_cv_to_jd
-import time
 
 
 def run_careerexplorer(cv_text: str, 
@@ -33,7 +32,6 @@ def run_careerexplorer(cv_text: str,
     cv_clean  = normalise_text(cv_text)
     t0 = time.time()
     top_m     = retrieve_top_m(cv_clean, job_texts, M=min(M, len(jobs)))
-    print(f"TF-IDF retrieval: {time.time()-t0:.2f}s")
 
     results = []
 
@@ -60,5 +58,4 @@ def run_careerexplorer(cv_text: str,
         results.append(result)
 
     results.sort(key=lambda r: r["fit_score"], reverse=True)
-    print(f"CareerFit loop: {time.time()-t0:.2f}s")
     return results

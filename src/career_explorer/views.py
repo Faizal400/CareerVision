@@ -1,7 +1,5 @@
 # src/career_explorer/views.py
 
-from time import time
-
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .services.careerexplorer_service import run_careerexplorer
@@ -43,7 +41,6 @@ def results_view(request):
             start = time.time()
             best_k_matches = run_careerexplorer(cv_text=cv_text, user_level=experience_level, M=k_jobs)
             elapsed = time.time() - start
-            print(f"Pipeline took: {elapsed:.2f}s")
             return render(request, "career_explorer/results.html", {"results": best_k_matches, "source": 0})
         else:
             return redirect("career_explorer_ingest")

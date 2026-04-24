@@ -27,7 +27,7 @@ def delete_account(request):
         user = request.user
         user.delete()
         return redirect("login")
-    return render(request, f"{TEMPLATES_FOLDER}/delete_acc_confirm.html")
+    return render(request, f"{TEMPLATES_FOLDER}/delete_confirm.html")
 
 @login_required
 def home(request):

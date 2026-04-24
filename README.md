@@ -4,105 +4,43 @@
 
 ---
 
-## What is CareerVision?
+## What it does
 
-CareerVision is a UK-aligned career matching platform built for students and early-career graduates who struggle to understand how well their CV matches the roles they're applying for.
+CareerVision is a career matching platform built for CS and tech students who want to know how well their CV actually matches the roles they're applying for — not just a vague "good luck" but a real breakdown.
 
-Most job seekers don't know which roles they're suited for, can't identify their skill gaps clearly, and get no actionable feedback from existing tools. CareerVision solves this by taking a user's CV, comparing it against a job corpus and the ESCO skills taxonomy, and returning ranked career matches with explainable scores and concrete next steps.
+There are three tools:
 
-### The three tools
+- **Career Explorer** — upload your CV, get a ranked list of jobs from the corpus with a CareerFit score, matched skills, missing skills, and what to do next
+- **Direct Job Match** — paste a specific job description alongside your CV and get a head-to-head match report
+- **Skill Tracker** — save the skills you're missing and track your progress over time (Not Started → In Progress → Done)
 
-- **Tool A — Career Explorer:** Upload your CV and get a ranked list of the best matching jobs from the database, with a CareerFit score, matched skills, missing skills, and next actions for each.
-- **Tool B — CV↔JD Matcher:** Paste a specific job description alongside your CV and get a direct match report — useful when you've already found a role you want.
-- **Tool C — Tracker:** Save missing skills from any match result and track your progress over time (mark skills as Not Started / In Progress / Complete).
-
----
-
-## Background and motivation
-
-This project was built as a Final Year Project worth 25% of my degree. The core problem it addresses is that students applying for jobs rarely get meaningful, structured feedback — they either get rejected silently or receive vague advice. CareerVision aims to give explainable, evidence-based feedback grounded in a real skills taxonomy (ESCO) rather than generic AI advice.
+The scoring model (CareerFit) combines six features: TF-IDF text similarity, semantic embedding similarity, skill overlap, skill gap penalty, market relevance of missing skills, and seniority alignment. Every result shows a breakdown of what contributed what.
 
 ---
 
-## Key design decisions
+## Background
 
-- **Django monolith** — single project for fast delivery and easy local demonstration
-- **ESCO v1.2.1 taxonomy** — 13,939 skills and 3,039 occupations with explicit skill-occupation relations
-- **Two-stage retrieval** — TF-IDF shortlist for speed, CareerFit re-ranking for accuracy
-- **CareerFit scoring model** — weighted combination of 4 features: text similarity (0.30), skill overlap (0.40), gap penalty (0.20), seniority alignment (0.10)
-- **Deterministic explanations** — all output is template-based, not LLM-generated, ensuring reproducibility
-- **Local job corpus** — static CSV of UK graduate job descriptions for reproducible evaluation
+I built this as a Final Year Project worth 25% of my degree. The core problem is that students applying for jobs rarely get useful, structured feedback — they either get rejected silently or get told "add more keywords." CareerVision tries to give explainable, evidence-based feedback grounded in a real skills taxonomy (ESCO) rather than generic AI advice.
+
+Skill extraction uses ESCO v1.2.1 (13,939 skills, 3,039 occupations). Jobs are mapped to ESCO occupations so that essential vs optional skill distinctions feed into scoring. Market relevance is computed from how often each skill appears across the job corpus within the same role family.
 
 ---
 
-## Known limitations
+## Setup
 
-- Job corpus is small (currently ~4 jobs) — evaluation becomes meaningful at 50+ real JDs
-- Skill extraction can produce false positives from the ESCO keyword layer
-- ESCO is EU-wide — some UK-specific terminology may not map perfectly
-- No live job board integration — corpus is static
+### Requirements
 
----
-
-## Project structure
-
-```
-CareerVision/
-├── src/                        # Django project root
-│   ├── config/                 # Settings, URLs, WSGI
-│   ├── career_explorer/        # Tool A — Career Explorer app
-│   │   ├── management/commands/
-│   │   │   ├── import_esco.py  # Load ESCO data into Django DB
-│   │   │   └── load_jobs.py    # Load job corpus into Django DB
-│   │   ├── services/
-│   │   │   ├── careerfit_service.py   # Full Tool A pipeline
-│   │   │   ├── retrieval_service.py   # TF-IDF retrieval
-│   │   │   └── text_extraction.py     # PDF/DOCX/TXT extraction
-│   │   ├── templates/career_explorer/
-│   │   ├── models.py           # ESCOSkill, Job, CareerExplorerRun, etc.
-│   │   ├── views.py
-│   │   └── forms.py
-│   ├── cv_matcher/             # Tool B — CV↔JD Matcher app
-│   ├── tracker/                # Tool C — Skill Tracker app
-│   ├── accounts/               # Auth app
-│   └── core_engine/            # Pure Python pipeline (no Django dependency)
-│       ├── preprocess.py       # Text normalisation
-│       ├── retrieval.py        # TF-IDF retrieval
-│       ├── skill_extraction.py # U/T skill set extraction
-│       ├── scoring.py          # CareerFit scoring model
-│       └── explanation.py      # Explanation generator
-├── data/
-│   ├── esco/v1_2_1/            # ESCO CSV files (not in git — see setup below)
-│   │   └── engine_ready/       # Pre-cleaned ESCO CSVs
-│   ├── db/                     # esco.sqlite3 (generated — not in git)
-│   └── jobs/
-│       └── dummy_jobs.csv      # UK job corpus
-├── scripts/
-│   ├── import_esco.py          # Standalone ESCO → esco.sqlite3 importer
-│   └── demo_hello_pipeline.py  # Smoke test for core engine
-├── docs/
-│   └── decision_log.md         # All design decisions, trade-offs, limitations
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Setup and installation
-
-### Prerequisites
-
-- Python 3.11 or 3.12 recommended (project developed on 3.14)
+- Python 3.12
 - Git
 
-### 1. Clone the repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/your-username/careervision.git
 cd careervision
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Virtual environment
 
 ```bash
 python -m venv .venv
@@ -110,7 +48,7 @@ python -m venv .venv
 # Windows
 .venv\Scripts\activate
 
-# macOS/Linux
+# Mac/Linux
 source .venv/bin/activate
 ```
 
@@ -120,100 +58,63 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Download ESCO data
+The sentence-transformers model (~90MB) downloads automatically on first run.
 
-Download ESCO v1.2.1 from [https://esco.ec.europa.eu/en/use-esco/download](https://esco.ec.europa.eu/en/use-esco/download).
+### 4. Environment variables (optional)
 
-Place the CSV files into:
-```
-data/esco/v1_2_1/
-```
+The app runs out of the box without a `.env`. To override anything:
 
-The following files are required:
-- `skills_en.csv`
-- `occupations_en.csv`
-- `occupationSkillRelations_en.csv`
-
-Pre-cleaned engine-ready versions must exist at:
-```
-data/esco/v1_2_1/engine_ready/esco_skills_clean.csv
-data/esco/v1_2_1/engine_ready/esco_occupations_clean.csv
-data/esco/v1_2_1/engine_ready/esco_occ_skill_clean.csv
+```bash
+cp .env.example .env
+# edit .env as needed
 ```
 
-### 5. Run Django migrations
+### 5. Set up the database
 
 ```bash
 cd src
 python manage.py migrate
 ```
 
-### 6. Import ESCO data into the standalone DB
+### 6. Import ESCO data
+
+Loads 13,939 skills and 3,039 occupations from the pre-built `esco.sqlite3`:
 
 ```bash
-cd ..
-python scripts/import_esco.py
-```
-
-Expected output:
-```
-Skills: {'read': 13939, 'inserted': 13939, 'skipped': 0}
-Occupations: {'read': 3039, 'inserted': 3039, 'skipped': 0}
-Relations: {'read': 126051, 'inserted': 126051, ...}
-```
-
-### 7. Import ESCO data into Django's DB
-
-```bash
-cd src
 python manage.py import_esco
 ```
 
-Both commands are idempotent — running them twice inserts 0 duplicate rows.
-
-### 8. Load the job corpus
+### 7. Load the job corpus
 
 ```bash
 python manage.py load_jobs
 ```
 
-### 9. Run the development server
+Expected: `Jobs created: 70`
+
+### 8. Map jobs to ESCO occupations
+
+```bash
+python manage.py map_jobs_to_esco
+```
+
+TF-IDF title matching to link each job to the closest ESCO occupation. Needed for essential/optional skill weighting.
+
+### 9. Classify role families
+
+```bash
+python manage.py classify_role_family
+```
+
+Assigns each job to a role family (tech_software, tech_data, tech_infrastructure, non_tech). Used for market relevance scoring.
+
+### 10. Run
 
 ```bash
 python manage.py runserver
 ```
 
----
-
-## Using the application
-
-Visit `http://127.0.0.1:8000/career-explorer/` in your browser.
-
-### Tool A — Career Explorer
-
-1. Upload a CV file (`.pdf`, `.docx`, or `.txt`) or paste CV text directly
-2. Select your experience level
-3. Click **Find My Matches**
-4. View ranked job matches with CareerFit scores, matched/missing skills, and next actions
-
-### Test URLs (development only)
-
-| URL | Purpose |
-|-----|---------|
-| `/career-explorer/` | Tool A — main interface |
-| `/career-explorer/results/` | Tool A — results page |
-| `/test-retrieval/` | TF-IDF retrieval smoke test |
-| `/test-skills/` | Skill extraction smoke test |
-| `/test-careerfit/?cv=python+django+sql` | Full pipeline smoke test |
-| `/admin/` | Django admin panel |
-
-### Admin credentials
-
-Create a superuser to access the admin panel:
-
-```bash
-python manage.py createsuperuser
-```
+Go to `http://127.0.0.1:8000` and register an account.
 
 ---
 
@@ -223,28 +124,80 @@ python manage.py createsuperuser
 cd src
 python manage.py test
 ```
+* To reproduce the ablation study results, run `python scripts/run_ablation.py` from the repo root (requires the full DB setup from steps 6-9 above). Prints four ranked top-10 lists — TF-IDF only, skill-only, semantic-only, and full CareerFit — against a sample CS graduate CV.*
+---
+
+## Project structure
+
+```
+CareerVision/
+├── src/
+│   ├── config/                     # Django settings, URLs
+│   ├── core_engine/                # Pure Python pipeline — no Django imports
+│   │   ├── preprocess.py           # Text normalisation
+│   │   ├── retrieval.py            # TF-IDF retrieval
+│   │   ├── skill_extraction.py     # Precision-first skill matching (U and T sets)
+│   │   ├── skill_aliases.py        # Curated alias dict + tech seed tokens
+│   │   ├── semantic_similarity.py  # Document-level semantic similarity
+│   │   ├── scoring.py              # CareerFit 6-feature scoring model
+│   │   ├── explanation.py          # Deterministic explanation templates
+│   │   ├── market_relevance.py     # Skill frequency scoring + role family classifier
+│   │   ├── comparison.py           # Shared CV↔JD comparison unit
+│   │   └── text_extraction.py      # PDF/DOCX/TXT extraction
+│   ├── career_explorer/            # Tool A — Career Explorer
+│   │   ├── management/commands/    # import_esco, load_jobs, map_jobs_to_esco, classify_role_family
+│   │   ├── services/               # careerexplorer_service.py
+│   │   └── templates/
+│   ├── cv_matcher/                 # Tool B — Direct Job Match
+│   │   ├── services/               # cv_matcher_service.py
+│   │   └── templates/
+│   ├── tracker/                    # Tool C — Skill Tracker
+│   ├── accounts/                   # Auth (register, login, logout, delete account)
+│   └── templates/                  # Shared templates (base, index, results_viewer)
+├── data/
+│   ├── db/esco.sqlite3             # Pre-built ESCO database
+│   ├── esco/v1_2_1/                # Raw ESCO CSV files
+│   └── jobs/dummy_jobs.csv         # 70 UK graduate job descriptions
+├── docs/
+│   └── decision_log.md             # Every design decision, trade-off, and limitation
+├── scripts/
+│   ├── import_esco.py              # Standalone script to build esco.sqlite3 from raw CSVs
+│   └── demo_hello_pipeline.py      # Smoke test for the core engine outside Django
+├── requirements.txt
+├── .env.example
+└── README.md
+```
 
 ---
 
-## Sample input
+## Design decisions
 
-A sample CV (`dummy_cv.txt`) is included in the repository root for testing. Upload it via the Career Explorer form to verify the pipeline is working correctly.
+Full rationale for every choice is in `docs/decision_log.md`. Short version:
+
+- **Django monolith** — fast delivery, easy to demo locally, ORM abstracts the DB
+- **ESCO v1.2.1** — structured, free, machine-readable taxonomy with 13,939 skills and explicit occupation-skill relations
+- **Two-stage retrieval** — TF-IDF shortlist first (cheap), CareerFit re-ranking second (expensive). Keeps the pipeline under 10 seconds for 70 jobs.
+- **Precision-first skill extraction** — phrase-rule matching with a curated alias dict rather than single-keyword extraction from ESCO labels. Earlier approach extracted single words from verbose ESCO labels and produced "clean building facade" as a matched skill for a Python developer CV.
+- **Document-level semantic embeddings** — sentence-transformers used for CV↔JD similarity at document level, not skill-level. Skill-level semantic matching against 13,939 ESCO labels produced too many false positives at any usable threshold.
+- **Essential vs optional skill weighting** — ESCO records whether each skill is essential or optional for an occupation. Missing an essential skill is penalised twice as much as missing an optional one.
+- **Market relevance** — missing a skill that appears in 55% of similar roles is more urgent than missing one in 5%. Feeds into both scoring and next actions priority.
+
+---
+
+## Known limitations
+
+- Skill extraction is scoped to tech/CS roles. Non-tech CVs produce small or empty skill sets — this is a documented scope decision.
+- ESCO occupation mapping uses TF-IDF title matching with a 0.5 threshold. Around 80% of mappings are accurate; the rest were manually corrected.
+- Job corpus is static (70 UK graduate JDs). Market relevance scores are corpus-relative.
+- Score ceiling is roughly 0.80 — CVs and JDs are different document formats so semantic similarity sits lower than a text-to-text match would.
 
 ---
 
-## Dependencies — notable packages
+## Test credentials
 
-| Package | Purpose |
-|---------|---------|
-| Django | Web framework |
-| scikit-learn | TF-IDF vectorisation and cosine similarity |
-| pandas | CSV loading and data manipulation |
-| pypdf | PDF text extraction |
-| python-docx | DOCX text extraction |
-| sentence-transformers | Semantic embeddings (planned extension) |
-| torch | Required by sentence-transformers |
+Register any account on the registration page. No pre-seeded users.
 
----
+Sample inputs for testing are in `scripts/demo_hello_pipeline.py`.
 
 ## Documentation
 

@@ -1,3 +1,8 @@
+"""
+Market relevance scoring — how often each skill appears across the job corpus.
+Cached per role family so it only runs once per server session.
+"""
+
 from django.core.cache import cache
 from career_explorer.models import Job
 from core_engine.skill_extraction import extract_skills
@@ -28,7 +33,7 @@ def compute_skill_frequencies(role_family=None) -> dict[str, float]:
     frequencies = {skill: count / total_jobs 
                    for skill, count in skill_counts.items()}
     
-    cache.set("skill_frequencies", frequencies, timeout=None)
+    cache.set(cache_key, frequencies, timeout=None)
     return frequencies
 
 

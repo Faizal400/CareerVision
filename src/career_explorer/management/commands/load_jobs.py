@@ -6,7 +6,6 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from career_explorer.models import Job
-from config import settings
 
 REPO_ROOT = Path(settings.BASE_DIR).parent # src/ => CareerVision/
 JOBS_CSV = REPO_ROOT / "data" / "jobs" / "dummy_jobs.csv"

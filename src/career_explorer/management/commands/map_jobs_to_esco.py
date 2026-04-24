@@ -1,7 +1,6 @@
 # src/career_explorer/management/commands/map_jobs_to_esco.py
 
 """
-One-off script to map Job entries to ESCO occupations, by exact title match.
 This is a one-off script to populate the esco_occupation field of Job entries.
 
 Uses TF-IDF to compare an ESCO occupation's label to the job title, and maps if there's a strong match.
