@@ -30,13 +30,11 @@ def run_careerexplorer(cv_text: str,
     # Step 1: TF-IDF shortlist - efficient retrieval
     job_texts = [normalise_text(j.description) for j in jobs]
     cv_clean  = normalise_text(cv_text)
-    t0 = time.time()
     top_m     = retrieve_top_m(cv_clean, job_texts, M=min(M, len(jobs)))
 
     results = []
 
     # Step 2: CareerFit score for each shortlisted job
-    t0 = time.time()
     for idx, _ in top_m:
         job = jobs[idx]
 
