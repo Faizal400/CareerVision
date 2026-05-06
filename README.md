@@ -36,7 +36,7 @@ Skill extraction uses ESCO v1.2.1 (13,939 skills, 3,039 occupations). Jobs are m
 ### 1. Clone
 
 ```bash
-git clone https://github.com/your-username/careervision.git
+git clone https://github.com/Faizal400/CareerVision/.git
 cd careervision
 ```
 
